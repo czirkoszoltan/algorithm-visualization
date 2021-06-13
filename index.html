@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="asset/prism.css">
+    <script src="asset/prism.js"></script>
+    <link rel="stylesheet" href="asset/animator.css">
+    <script src="asset/animator.js"></script>
+    <style>
+    body {
+        font-size: 100%;
+        font-family: sans-serif;
+    }
+    svg {
+        border: 1px dashed rgba(0, 0, 0, 0.25);
+        max-width: 100%;
+    }
+    </style>
+</head>
+
+<body>
+
+<h1>Algorithm Visualization with Generators: Examples</h1>
+
+<p>Repository: <a href="https://github.com/czirkoszoltan/algorithm-visualization">https://github.com/czirkoszoltan/algorithm-visualization</a>.</p>
+
+<h2>Sorting</h2>
+
+<svg style="width: 640px; height: 480px;" id="svgsort">
+  <g class="button" id="buttonk">
+    <rect fill="green" x="10.5" y="10.5" width="150" height="30"></rect>
+    <text x="85" y="25" >Next</text>
+  </g>
+
+  <g class="button" id="buttons">
+    <rect fill="green" x="170.5" y="10.5" width="150" height="30"></rect>
+    <text x="245" y="25">Start over</text>
+  </g>
+
+  <g class="button" id="buttonf">
+    <rect fill="green" x="330.5" y="10.5" width="150" height="30"></rect>
+    <text x="405" y="25">Continuous</text>
+  </g>
+
+  <g class="anim" transform="translate(80 100)">
+  </g>
+
+  <text x="10" y="180" class="code"></text>
+</svg>
+
+
+<script>
+(function() {
+    
+let ator = new animator(document.getElementById('svgsort'));
+let code = `
+void selection_sort(double* arr, int n) {
+    for (int i = 0; i < n-1; ++i) {
+        int min = i;
+        for (int j = i+1; j < n; ++j)
+            if (arr[j] < arr[min])
+                min = i;
+
+        if (i != min) {
+            double temp = arr[i];
+            arr[i] = arr[min];
+            arr[min] = temp;
+        }
+    }
+}
+`;
+ator.add_code('.code', code);
+
+function* algo() {
+    ator.clear('.anim');
+    let circles = [];
+    for (let i = 0; i < 10; ++i) {
+        let num = (Math.random() * 90 + 10) << 0;
+        let circle = ator.add_circle('.anim', i*50 + 0, 0, 20, num);
+        circle.data = num;
+        circles.push(circle);
+    }
+    yield true;
+
+    for (let i = 0; i < circles.length-1; ++i) {
+        let minidx = i;
+        for (let j = i+1; j < circles.length; ++j)
+            if (circles[j].data < circles[minidx].data)
+                minidx = j;
+
+        circles[i].circle.classList.add('yellow');
+        circles[minidx].circle.classList.add('blue');
+        yield true;
+
+        if (i != minidx) {
+            let temp = circles[minidx];
+            circles[minidx] = circles[i];
+            circles[i] = temp;
+
+            let xi = circles[i].x;
+            let xm = circles[minidx].x;
+            circles[i].moveto(xm, 0);
+            circles[minidx].moveto(xi, 0);
+            yield true;
+        }
+
+        circles[minidx].circle.classList.remove('yellow');
+        circles[i].circle.classList.remove('blue');
+        circles[i].circle.classList.add('green');
+
+        yield true;
+    }
+    circles[circles.length-1].circle.classList.add('green');
+}
+
+let gen = algo();
+gen.next();
+ator.svg.getElementById('buttonk').addEventListener('click', function() {
+    gen.next();
+});
+ator.svg.getElementById('buttons').addEventListener('click', function() {
+    gen = algo();
+    gen.next();
+});
+ator.svg.getElementById('buttonf').addEventListener('click', function() {
+    function next() {
+        if (gen.next().value)
+            setTimeout(next, 350);
+    }
+    next();
+});
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Tree traversal</h2>
+    
+<svg style="width: 640px; height: 360px;" id="svgtree">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L0,8 L10,4 z" />
+    </marker>
+  </defs>
+
+  <g class="button" id="buttonk">
+    <rect fill="green" x="10.5" y="10.5" width="150" height="30"></rect>
+    <text x="85" y="25" >Next</text>
+  </g>
+
+  <g class="button" id="buttons">
+    <rect fill="green" x="170.5" y="10.5" width="150" height="30"></rect>
+    <text x="245" y="25">Start over</text>
+  </g>
+
+  <g class="button" id="buttonf">
+    <rect fill="green" x="330.5" y="10.5" width="150" height="30"></rect>
+    <text x="405" y="25">Continuous</text>
+  </g>
+
+  <g class="anim">
+  </g>
+
+  <text x="10" y="180" class="code"></text>
+</svg>
+
+
+<script>
+(function() {
+    
+let ator = new animator(document.getElementById('svgtree'));
+
+function* algo() {
+    ator.clear('.anim');
+    function newnode(val) {
+        return {
+            left: null,
+            right: null,
+            val: val
+        };
+    }
+    let root;
+    root = newnode(5);
+    root.left = newnode(3);
+    root.left.left = newnode(1);
+    root.left.left.left = newnode(0);
+    root.left.left.right = newnode(2);
+    root.left.right = newnode(4);
+    root.right = newnode(7);
+    root.right.left = newnode(6);
+    root.right.right = newnode(9);
+    root.right.right.left = newnode(8);
+
+    function draw(root, x, y, dx) {
+        if (!root)
+            return;
+        if (root.left) {
+            root.leftline = ator.add_line('.anim', x, y, x-dx, y+70, 'arrow', 25, 25);
+            draw(root.left, x-dx, y+70, dx/2);
+        }
+        if (root.right) {
+            root.rightline = ator.add_line('.anim', x, y, x+dx, y+70, 'arrow', 25, 25);
+            draw(root.right, x+dx, y+70, dx/2);
+        }
+        root.circle = ator.add_circle('.anim', x, y, 20, root.val);
+    }
+    draw(root, 320, 100, 150);
+    yield true;
+
+    function* traverse(root) {
+        if (!root)
+            yield false;
+
+        root.circle.circle.classList.add('green');
+        yield true;
+
+        if (root.left) {
+            root.leftline.line.classList.add('lw5');
+            yield* traverse(root.left);
+            root.leftline.line.classList.remove('lw5');
+            yield true;
+        }
+
+        root.circle.circle.classList.add('yellow');
+        yield true;
+
+        if (root.right) {
+            root.rightline.line.classList.add('lw5');
+            yield* traverse(root.right);
+            root.rightline.line.classList.remove('lw5');
+            yield true;
+        }
+    }
+
+    yield* traverse(root);
+}
+
+let gen = algo();
+gen.next();
+ator.svg.getElementById('buttonk').addEventListener('click', function() {
+    gen.next();
+});
+ator.svg.getElementById('buttons').addEventListener('click', function() {
+    gen = algo();
+    gen.next();
+});
+ator.svg.getElementById('buttonf').addEventListener('click', function() {
+    function next() {
+        if (gen.next().value)
+            setTimeout(next, 350);
+    }
+    next();
+});
+
+})();
+</script>
+
+
+</body>
+</html>

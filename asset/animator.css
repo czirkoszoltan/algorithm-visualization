@@ -1,0 +1,68 @@
+    circle, line {
+        stroke: black;
+        stroke-width: 1px;
+    }
+    circle {
+        fill: pink;
+    }
+    .lw5 {
+        stroke-width: 2px;
+    }
+
+    g.button {
+        cursor: pointer;
+    }
+    g.button rect {
+        fill: #ccc;
+        stroke: #999;
+        stroke-width: 1px;
+        rx: 5px;
+        ry: 5px;
+    }
+    g.button:hover rect {
+        fill: #ddd;
+    }
+    g.button text {
+        text-anchor: middle;
+        dominant-baseline: central;
+    }
+
+    g.anim {
+        cursor: default;
+    }
+    g.anim text {
+        text-anchor: middle;
+        dominant-baseline: central;
+        cursor: inherit;
+    }
+
+    text.code {
+        font-family: monospace;
+        font-size: 144%;
+        white-space: pre;
+    }
+    text tspan.debug {
+        visibility: hidden;
+        fill: yellow;
+        stroke: black;
+        stroke-width: 0.75px;
+    }
+    text .line-highlight {
+        font-weight: bold;
+    }
+    text .line-highlight tspan.debug {
+        visibility: visible;
+    }
+
+    circle {
+        transition: all 0.35s;
+    }
+    circle.green {
+        fill: lightgreen;
+    }
+    circle.blue {
+        fill: lightblue;
+    }
+    circle.yellow {
+        fill: yellow;
+    }
